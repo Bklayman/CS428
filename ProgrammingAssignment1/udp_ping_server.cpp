@@ -14,14 +14,14 @@
 
 using namespace std;
 
-#define PORT	 12000
+#define PORT	 12006
 
 
 int main() {
 	int sockfd, n;
-	socklen_t len = 0;
 	char buffer[1024];
 	struct sockaddr_in servaddr, cliaddr;
+	socklen_t len = sizeof(cliaddr);
 
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
@@ -49,6 +49,7 @@ int main() {
 
         while (1) {
 
+		cout << "Ready to receive" << endl;
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
@@ -57,9 +58,13 @@ int main() {
 
 		buffer[n] = '\0';
 
+		cout << "Received" << endl;
+
 		//If a random number in the range of 0 to 10 is less than 4,
 		//we consider the packet lost and do not respond
 		//if (rand()%10 < 4) continue;
+		
+		cout << "Message Sent" << endl;
 
 		//Otherwise, the server responds
 		sendto(sockfd, (const char *)buffer, strlen(buffer),

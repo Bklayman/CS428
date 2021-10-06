@@ -14,31 +14,29 @@
 
 using namespace std;
 
-#define PORT	 12000
+#define PORT	 12006
 
 int main() {
 
 	int sockfd, n;
-  socklen_t len = 0;
 	char buffer[1024];
   int numPings = 10;
-	struct sockaddr_in servaddr, cliaddr;
+	struct sockaddr_in servaddr;
+	socklen_t len = sizeof(servaddr);
 
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+		cout << "Socket Creation Error" << endl;
+		exit(1);
+	}
 
 	memset(&servaddr, 0, sizeof(servaddr));
-	memset(&cliaddr, 0, sizeof(cliaddr));
 
-	// Fill client information
+	// Fill server information
 	servaddr.sin_family = AF_INET; // IPv4
 	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
 	servaddr.sin_port = htons(PORT); // port number
-
-
-	// Bind the socket with the client address
-	//bind(sockfd, (const struct sockaddr *)&cliaddr, sizeof(cliaddr));
 
   time_t before;
   time_t after;
@@ -52,10 +50,13 @@ int main() {
     sendto(sockfd, (const char *)buffer, strlen(buffer),
 			MSG_CONFIRM, (const struct sockaddr *) &servaddr, len);
 
+    cout << "Message Sent" << endl;
+
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &servaddr, &len); //Stuck here
 		buffer[n] = '\0';
+		cout << "Message Received" << endl;
     time(&after);
 
     timeElapsed = difftime(before, after);
