@@ -15,7 +15,6 @@
 using namespace std;
 
 #define PORT	 12000
-#define MSG_CONFIRM 0x800
 
 int main() {
 
@@ -33,13 +32,13 @@ int main() {
 	memset(&cliaddr, 0, sizeof(cliaddr));
 
 	// Fill client information
-	cliaddr.sin_family = AF_INET; // IPv4
-	cliaddr.sin_addr.s_addr = INADDR_ANY; // localhost
-	cliaddr.sin_port = htons(PORT); // port number
+	servaddr.sin_family = AF_INET; // IPv4
+	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
+	servaddr.sin_port = htons(PORT); // port number
 
 
 	// Bind the socket with the client address
-	bind(sockfd, (const struct sockaddr *)&cliaddr, sizeof(cliaddr));
+	//bind(sockfd, (const struct sockaddr *)&cliaddr, sizeof(cliaddr));
 
   time_t before;
   time_t after;
