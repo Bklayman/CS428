@@ -12,12 +12,15 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+using namespace std;
+
 #define PORT	 12000
+#define MSG_CONFIRM 0x800
 
 
 int main() {
 	int sockfd, n;
-	socklen_t len;
+	socklen_t len = 0;
 	char buffer[1024];
 	struct sockaddr_in servaddr, cliaddr;
 
@@ -40,9 +43,13 @@ int main() {
 	srand(time(0));
 
         while (1) {
+
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
+
+			cout << "Here" << endl;
+
 		buffer[n] = '\0';
 
 		//If a random number in the range of 0 to 10 is less than 4,
@@ -50,9 +57,8 @@ int main() {
 		//if (rand()%10 < 4) continue;
 
 		//Otherwise, the server responds
-		//Changed MSG_CONFIRM to 0. Not defined on mac, which I use locally
 		sendto(sockfd, (const char *)buffer, strlen(buffer),
-			MSG_CONFIRM , (const struct sockaddr *) &cliaddr, len);
+			MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);
 	}
 	return 0;
 }

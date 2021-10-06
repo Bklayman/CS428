@@ -12,13 +12,15 @@
 #include <time.h>
 #include <unistd.h>
 
+using namespace std;
 
 #define PORT	 12000
-
+#define MSG_CONFIRM 0x800
 
 int main() {
+
 	int sockfd, n;
-	socklen_t len;
+  socklen_t len = 0;
 	char buffer[1024];
   int numPings = 10;
 	struct sockaddr_in servaddr, cliaddr;
@@ -35,6 +37,7 @@ int main() {
 	cliaddr.sin_addr.s_addr = INADDR_ANY; // localhost
 	cliaddr.sin_port = htons(PORT); // port number
 
+
 	// Bind the socket with the client address
 	bind(sockfd, (const struct sockaddr *)&cliaddr, sizeof(cliaddr));
 
@@ -46,14 +49,13 @@ int main() {
   //numPings initially set to 10
   for(int i = 0; i < numPings; i++) {
     //Send a ping to the server and get current time
-    //Changed MSG_CONFIRM to 0. Not defined on mac, which I use locally
     time(&before);
     sendto(sockfd, (const char *)buffer, strlen(buffer),
-			MSG_CONFIRM , (const struct sockaddr *) &servaddr, len);
+			MSG_CONFIRM, (const struct sockaddr *) &servaddr, len);
 
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
-			MSG_WAITALL, ( struct sockaddr *) &servaddr, &len);
+			MSG_WAITALL, ( struct sockaddr *) &servaddr, &len); //Stuck here
 		buffer[n] = '\0';
     time(&after);
 
