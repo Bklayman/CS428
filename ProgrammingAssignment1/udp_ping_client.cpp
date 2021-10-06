@@ -48,7 +48,7 @@ int main() {
     //Send a ping to the server and get current time
     time(&before);
     sendto(sockfd, (const char *)buffer, strlen(buffer),
-			MSG_CONFIRM, (const struct sockaddr *) &servaddr, len);
+			0, (const struct sockaddr *) &servaddr, len);
 
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
