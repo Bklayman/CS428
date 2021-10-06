@@ -12,21 +12,22 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-using namespace std;
-
 #define PORT	 12000
-#define MSG_CONFIRM 0x800
 
+using namespace std;
 
 int main() {
 	int sockfd, n;
-	socklen_t len = 0;
+	socklen_t len;
 	char buffer[1024];
 	struct sockaddr_in servaddr, cliaddr;
 
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+		cout << "Socket Creation Error" << endl;
+		exit(1);
+	}
 
 	memset(&servaddr, 0, sizeof(servaddr));
 	memset(&cliaddr, 0, sizeof(cliaddr));
@@ -37,19 +38,18 @@ int main() {
 	servaddr.sin_port = htons(PORT); // port number
 
 	// Bind the socket with the server address
-	bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr));
+	if((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr))) < 0){
+		cout << "Bind Error" << endl;
+		exit(1);
+	}
 
 	// random generator
 	srand(time(0));
 
         while (1) {
-
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
-
-			cout << "Here" << endl;
-
 		buffer[n] = '\0';
 
 		//If a random number in the range of 0 to 10 is less than 4,
