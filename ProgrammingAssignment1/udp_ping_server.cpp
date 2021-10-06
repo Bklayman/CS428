@@ -47,9 +47,10 @@ int main() {
 
 		//If a random number in the range of 0 to 10 is less than 4,
 		//we consider the packet lost and do not respond
-		if (rand()%10 < 4) continue;
+		//if (rand()%10 < 4) continue;
 
 		//Otherwise, the server responds
+		//Changed MSG_CONFIRM to 0. Not defined on mac, which I use locally
 		sendto(sockfd, (const char *)buffer, strlen(buffer),
 			0, (const struct sockaddr *) &cliaddr, len);
 	}

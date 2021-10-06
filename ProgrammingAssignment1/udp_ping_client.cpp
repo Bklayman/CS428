@@ -46,6 +46,7 @@ int main() {
   //numPings initially set to 10
   for(int i = 0; i < numPings; i++) {
     //Send a ping to the server and get current time
+    //Changed MSG_CONFIRM to 0. Not defined on mac, which I use locally
     time(&before);
     sendto(sockfd, (const char *)buffer, strlen(buffer),
 			0, (const struct sockaddr *) &servaddr, len);
