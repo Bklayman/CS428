@@ -15,6 +15,7 @@
 using namespace std;
 
 #define PORT	 12000
+#define MSG_CONFIRM 0x800
 
 
 int main() {
@@ -25,10 +26,7 @@ int main() {
 
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
-	if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
-		cout << "Socket Creation Failed" << endl;
-		exit(1);
-	}
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	memset(&servaddr, 0, sizeof(servaddr));
 	memset(&cliaddr, 0, sizeof(cliaddr));
@@ -39,10 +37,7 @@ int main() {
 	servaddr.sin_port = htons(PORT); // port number
 
 	// Bind the socket with the server address
-	if((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr))) < 0){
-		cout << "Bind Error" << endl;
-		exit(1);
-	}
+	bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr));
 
 	// random generator
 	srand(time(0));
