@@ -52,7 +52,7 @@ int main() {
 		//Otherwise, the server responds
 		//Changed MSG_CONFIRM to 0. Not defined on mac, which I use locally
 		sendto(sockfd, (const char *)buffer, strlen(buffer),
-			0, (const struct sockaddr *) &cliaddr, len);
+			MSG_CONFIRM , (const struct sockaddr *) &cliaddr, len);
 	}
 	return 0;
 }

@@ -49,7 +49,7 @@ int main() {
     //Changed MSG_CONFIRM to 0. Not defined on mac, which I use locally
     time(&before);
     sendto(sockfd, (const char *)buffer, strlen(buffer),
-			0, (const struct sockaddr *) &servaddr, len);
+			MSG_CONFIRM , (const struct sockaddr *) &servaddr, len);
 
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
