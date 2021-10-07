@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define PORT	 12002
+#define PORT	 12008
 
 using namespace std;
 
@@ -49,20 +49,16 @@ int main() {
 
         while (1) {
 
-		cout << "Waiting to Receive" << endl;
-
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
 		buffer[n] = '\0';
 
-		cout << "Received Message" << endl;
-
 		//If a random number in the range of 0 to 10 is less than 4,
 		//we consider the packet lost and do not respond
-		//if (rand()%10 < 4) continue;
-		
-		cout << "Sending Message" << endl;
+		if (rand()%10 < 4){
+			continue;
+		}
 
 		//Otherwise, the server responds
 		sendto(sockfd, (const char *)buffer, strlen(buffer),

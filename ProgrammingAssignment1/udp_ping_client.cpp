@@ -11,8 +11,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <chrono>
 
-#define PORT	 12002
+#define PORT	 12008
 
 using namespace std;
 
@@ -21,6 +22,8 @@ int main() {
 	socklen_t len;
 	char buffer[1024];
 	struct sockaddr_in servaddr;
+	struct timeval timeout;
+	fd_set readfds;
 
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
@@ -36,24 +39,42 @@ int main() {
 	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
 	servaddr.sin_port = htons(PORT); // port number
 
+	// Set the timeout variable to one second
+	timeout.tv_sec = 1;
+	timeout.tv_usec = 0;
+
+	FD_ZERO(&readfds);
+	FD_SET(sockfd, &readfds);
+
 	len = sizeof(servaddr);
 
   for(int i = 0; i < 10; i++) {
-		//Otherwise, the server responds
+	  chrono::high_resolution_clock::time_point before = chrono::high_resolution_clock::now();
 		if((sendto(sockfd, (const char *)buffer, strlen(buffer),
 			MSG_CONFIRM, (const struct sockaddr *) &servaddr, len)) < 0){
 			cout << "Send Error" << endl;
 			exit(1);
 		}
 
-		cout << "Message Sent" << endl;
+		n = select(32, &readfds, NULL, NULL, &timeout);
+		if(n <= 0){
 
-		//Receive the client packet along with the address it is coming from
-		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
-			MSG_WAITALL, ( struct sockaddr *) &servaddr, &len);
-		buffer[n] = '\0';
+			cout << "Timeout: No message received within 1 second" << endl;
+			timeout.tv_sec = 1;
+			timeout.tv_usec = 0;
 
-		cout << "Message Received" << endl;
+			FD_ZERO(&readfds);
+			FD_SET(sockfd, &readfds);
+
+		} else {
+		
+			n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
+				MSG_WAITALL, ( struct sockaddr *) &servaddr, &len);
+			buffer[n] = '\0';
+			chrono::high_resolution_clock::time_point after = chrono::high_resolution_clock::now();
+			chrono::duration<double, milli> duration = after - before;
+			cout << "RTT: " << duration.count() << endl;
+		}
 	}
 	return 0;
 }
