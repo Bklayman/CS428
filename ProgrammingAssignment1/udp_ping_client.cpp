@@ -1,6 +1,6 @@
 // UDP Pinger
 
-// Must have this server running before you can run the UDP Pinger Client code
+// Must have the server running before you can run this UDP Pinger Client code
 
 #include <iostream>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define PORT	 12000
+#define PORT	 12002
 
 using namespace std;
 
@@ -20,7 +20,7 @@ int main() {
 	int sockfd, n;
 	socklen_t len;
 	char buffer[1024];
-	struct sockaddr_in servaddr, cliaddr;
+	struct sockaddr_in servaddr;
 
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
@@ -30,22 +30,30 @@ int main() {
 	}
 
 	memset(&servaddr, 0, sizeof(servaddr));
-	memset(&cliaddr, 0, sizeof(cliaddr));
 
 	// Fill server information
 	servaddr.sin_family = AF_INET; // IPv4
 	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
 	servaddr.sin_port = htons(PORT); // port number
 
+	len = sizeof(servaddr);
+
   for(int i = 0; i < 10; i++) {
 		//Otherwise, the server responds
-		sendto(sockfd, (const char *)buffer, strlen(buffer),
-			MSG_CONFIRM, (const struct sockaddr *) &servaddr, len);
+		if((sendto(sockfd, (const char *)buffer, strlen(buffer),
+			MSG_CONFIRM, (const struct sockaddr *) &servaddr, len)) < 0){
+			cout << "Send Error" << endl;
+			exit(1);
+		}
+
+		cout << "Message Sent" << endl;
 
 		//Receive the client packet along with the address it is coming from
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &servaddr, &len);
 		buffer[n] = '\0';
+
+		cout << "Message Received" << endl;
 	}
 	return 0;
 }
