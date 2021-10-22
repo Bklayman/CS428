@@ -24,7 +24,7 @@ int main() {
 
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
-	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+	if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
 		cout << "Socket Creation Error" << endl;
 		exit(1);
 	}
@@ -53,6 +53,12 @@ int main() {
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
 		buffer[n] = '\0';
+
+		//If a random number in the range of 0 to 10 is less than 4,
+		//we consider the packet lost and do not respond
+		if (rand()%10 < 4){
+			continue;
+		}
 
 		//Otherwise, the server responds
 		sendto(sockfd, (const char *)buffer, strlen(buffer),
