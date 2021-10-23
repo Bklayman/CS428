@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define PORT	 12002
+#define PORT	 12011
 
 using namespace std;
 
@@ -55,6 +55,7 @@ int main() {
 	}
 
 	len = sizeof(servaddr);
+	n = 0;
 
         while (1) {
 
@@ -71,10 +72,12 @@ int main() {
 		n = recvfrom(connfd, (char*) buffer, sizeof(buffer), MSG_WAITALL, (struct sockaddr*) &cliaddr, &len);
 		buffer[n] = '\0';
 		if(n > 0){
+			sendto(connfd, (const char*) buffer, strlen(buffer), MSG_CONFIRM, (const struct sockaddr*) &cliaddr, len);
+
 			cout << n << endl;
 			cout << buffer << endl;
 		}
-		//cout << buffer << endl;
+		
 	}
 	return 0;
 }

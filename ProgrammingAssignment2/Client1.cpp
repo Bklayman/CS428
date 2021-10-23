@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define PORT	 12002
+#define PORT	 12011
 
 using namespace std;
 
@@ -43,6 +43,8 @@ int main() {
 		exit(1);
 	}
 
+	n = 0;
+
   	for(int i = 0; i < msgCount; i++) {
 		// Obtain current time and send a ping to the server
 		/*if((sendto(sockfd, (const char *)buffer, strlen(buffer),
@@ -54,11 +56,24 @@ int main() {
 		// No timeout, receive message, get current time, and print difference between both obtained times
 		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &servaddr, &len);
-		buffer[n] = '\0';
-		cout << "Received" << endl;*/
+		buffer[n] = '\0';*/
+		
 
-		//write(sockfd, (char*)buffer, sizeof(buffer));
-		sendto(sockfd, "Hi", strlen("Hi"), MSG_CONFIRM, (const struct sockaddr*) &servaddr, len);
+		if(sendto(sockfd, "Hi There\0", strlen("Hi There.\0"), MSG_CONFIRM, (const struct sockaddr*) &servaddr, len) < 0){
+			cout << "Send Error" << endl;
+			exit(1);
+		}
+
+		n = recvfrom(sockfd, (char*)buffer, sizeof(buffer), MSG_WAITALL, (struct sockaddr*) &servaddr, &len);
+		if(n < 0){
+			cout << "Receive Error" << endl;
+			exit(1);
+		}
+
+		if(n > 0){
+			cout << n << endl;
+			cout << buffer << endl;
+		}
 
 		//memset(buffer, 0, sizeof(buffer));
 
