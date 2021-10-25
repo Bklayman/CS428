@@ -12,19 +12,19 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define PORT	 12008
+#define PORT	 12011
 
 using namespace std;
 
 int main() {
-	int sockfd, n;
+	int sockfd, n, connfd;
 	socklen_t len;
 	char buffer[1024];
 	struct sockaddr_in servaddr, cliaddr;
 
 	// Create a UDP socket
 	// Notice the use of SOCK_DGRAM for UDP packets
-	if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 		cout << "Socket Creation Error" << endl;
 		exit(1);
 	}
@@ -43,26 +43,41 @@ int main() {
 		exit(1);
 	}
 
-	// random generator
-	srand(time(0));
+	if(listen(sockfd, 5) != 0){
+		cout << "Listen Error" << endl;
+		exit(1);
+	}
+
+	connfd = accept(sockfd, (struct sockaddr*)&cliaddr, &len);
+	if(connfd < 0){
+		cout << "Accept Error" << endl;
+		exit(1);
+	}
+
 	len = sizeof(servaddr);
+	n = 0;
 
         while (1) {
 
 		//Receive the client packet along with the address it is coming from
-		n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
+		/*n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
 			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
 		buffer[n] = '\0';
 
-		//If a random number in the range of 0 to 10 is less than 4,
-		//we consider the packet lost and do not respond
-		if (rand()%10 < 4){
-			continue;
-		}
-
 		//Otherwise, the server responds
 		sendto(sockfd, (const char *)buffer, strlen(buffer),
-			MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);
+			MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);*/
+
+		//n = read(sockfd, (char*)buffer, sizeof(buffer));
+		n = recvfrom(connfd, (char*) buffer, sizeof(buffer), MSG_WAITALL, (struct sockaddr*) &cliaddr, &len);
+		buffer[n] = '\0';
+		if(n > 0){
+			sendto(connfd, (const char*) buffer, strlen(buffer), MSG_CONFIRM, (const struct sockaddr*) &cliaddr, len);
+
+			cout << n << endl;
+			cout << buffer << endl;
+		}
+		
 	}
 	return 0;
 }
