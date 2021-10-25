@@ -5,8 +5,10 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
+
 #define MAX 80
-#define PORT 8080
+#define PORT 8081
 #define SA struct sockaddr
 
 // Function designed for chat between client and server.
@@ -21,7 +23,7 @@ void func(int sockfd)
         // read the message from client and copy it in buffer
         read(sockfd, buff, sizeof(buff));
         // print buffer which contains the client contents
-        printf("From client: %s\t To client : ", buff);
+        printf("Server: From client: %s\t To client : ", buff);
         bzero(buff, MAX);
         n = 0;
         // copy server message in the buffer
@@ -33,7 +35,7 @@ void func(int sockfd)
 
         // if msg contains "Exit" then server exit and chat ended.
         if (strncmp("exit", buff, 4) == 0) {
-            printf("Server Exit...\n");
+            printf("Server: Server Exit...\n");
             break;
         }
     }
@@ -42,17 +44,18 @@ void func(int sockfd)
 // Driver function
 int main()
 {
-    int sockfd, connfd, len;
+    int sockfd, connfd; 
+    socklen_t len;
     struct sockaddr_in servaddr, cli;
 
     // socket create and verification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
-        printf("socket creation failed...\n");
+        printf("Server: socket creation failed...\n");
         exit(0);
     }
     else
-        printf("Socket successfully created..\n");
+        printf("Server: Socket successfully created..\n");
     bzero(&servaddr, sizeof(servaddr));
 
     // assign IP, PORT
@@ -62,29 +65,29 @@ int main()
 
     // Binding newly created socket to given IP and verification
     if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
-        printf("socket bind failed...\n");
+        printf("Server: socket bind failed...\n");
         exit(0);
     }
     else
-        printf("Socket successfully binded..\n");
+	printf("Socket successfully binded..\n");
 
     // Now server is ready to listen and verification
     if ((listen(sockfd, 5)) != 0) {
-        printf("Listen failed...\n");
+        printf("Server: Listen failed...\n");
         exit(0);
     }
     else
-        printf("Server listening..\n");
+        printf("Server: Server listening..\n");
     len = sizeof(cli);
 
     // Accept the data packet from client and verification
     connfd = accept(sockfd, (SA*)&cli, &len);
     if (connfd < 0) {
-        printf("server accept failed...\n");
+        printf("Server: server accept failed...\n");
         exit(0);
     }
     else
-        printf("server accept the client...\n");
+        printf("Server: server accept the client...\n");
 
     // Function for chatting between client and server
     func(connfd);
