@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
@@ -42,7 +43,8 @@ void func(int sockfd)
 // Driver function
 int main()
 {
-    int sockfd, connfd, len;
+    int sockfd, connfd; 
+    socklen_t len;
     struct sockaddr_in servaddr, cli;
 
     // socket create and verification
