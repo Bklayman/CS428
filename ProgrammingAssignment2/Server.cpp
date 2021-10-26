@@ -80,8 +80,6 @@ int main()
     strcpy(msg2, buff);
 
     // create the string to send back to the clients detailing the order the clients were received in
-    const char* mid = " received before ";
-    char final[MAX];
     strcpy(final, msg1);
     strcat(final, mid);
     strcat(final, msg2);
