@@ -29,16 +29,19 @@ int main()
     servaddr.sin_addr.s_addr = INADDR_ANY;
     servaddr.sin_port = htons(PORT);
 
-    // connect the client socket to server socket
+    // socket connect and verification
     if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
         printf("Client2: Connect Error\n");
         exit(1);
     }
 
+    // Assign the client name to the buffer and send the buffer to the server
     bzero(buff, sizeof(buff));
     strcpy(buff, "Client Y: Bob");
     strcpy(sent1, buff);
     write(sockfd, buff, sizeof(buff));
+
+    // receive the client connect order from the server, print the original sent message, and print the received message
     bzero(buff, sizeof(buff));
     read(sockfd, buff, sizeof(buff));
     printf("Client Y: %s\n", sent1);
