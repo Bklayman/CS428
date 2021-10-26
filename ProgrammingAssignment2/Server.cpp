@@ -1,3 +1,4 @@
+#include <cstring>
 #include <stdio.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -81,11 +82,15 @@ int main()
 
     strcpy(msg2, buff);
 
-    strcpy(buff, "X: Alice Received\n");
+    const char* mid = " received before ";
+    char final[MAX];
+    strcpy(final, msg1);
+    strcat(final, mid);
+    strcat(final, msg2);
 
     // and send that buffer to client
-    write(connfd1, buff, sizeof(buff));
-    write(connfd2, buff, sizeof(buff));
+    write(connfd1, final, sizeof(final));
+    write(connfd2, final, sizeof(final));
 
     printf("Sent acknowledgement to both X and Y\n");
 
