@@ -31,12 +31,12 @@ int main()
 
     // connect the client socket to server socket
     if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
-        printf("Client1: Connect Error\n");
+        printf("Client2: Connect Error\n");
         exit(1);
     }
 
     bzero(buff, sizeof(buff));
-    strcpy(buff, "Client X: Alice\n");
+    strcpy(buff, "Client Y: Bob\n");
     strcpy(sent1, buff);
     write(sockfd, buff, sizeof(buff));
     bzero(buff, sizeof(buff));

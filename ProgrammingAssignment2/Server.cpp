@@ -1,83 +1,94 @@
-// UDP Pinger
-
-// Must have this server running before you can run the UDP Pinger Client code
-
-#include <iostream>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include <stdio.h>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#define PORT	 12011
+#define MAX 80
+#define PORT 8081
+#define SA struct sockaddr
 
-using namespace std;
+// Driver function
+int main()
+{
+    int sockfd, connfd1, connfd2, n;
+    socklen_t len;
+    struct sockaddr_in servaddr, cli;
+		char buff[MAX];
 
-int main() {
-	int sockfd, n, connfd;
-	socklen_t len;
-	char buffer[1024];
-	struct sockaddr_in servaddr, cliaddr;
+    // socket create and verification
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        printf("Socket Creation Error");
+        exit(1);
+    }
 
-	// Create a UDP socket
-	// Notice the use of SOCK_DGRAM for UDP packets
-	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
-		cout << "Socket Creation Error" << endl;
-		exit(1);
-	}
+    bzero(&servaddr, sizeof(servaddr));
 
-	memset(&servaddr, 0, sizeof(servaddr));
-	memset(&cliaddr, 0, sizeof(cliaddr));
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port = htons(PORT);
 
-	// Fill server information
-	servaddr.sin_family = AF_INET; // IPv4
-	servaddr.sin_addr.s_addr = INADDR_ANY; // localhost
-	servaddr.sin_port = htons(PORT); // port number
+    // Binding newly created socket to given IP and verification
+    if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
+        printf("Socket Bind Error");
+        exit(1);
+    }
 
-	// Bind the socket with the server address
-	if((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr))) < 0){
-		cout << "Bind Error" << endl;
-		exit(1);
-	}
+    // Now server is ready to listen and verification
+    if ((listen(sockfd, 5)) != 0) {
+        printf("Server Listen Error");
+        exit(1);
+    }
 
-	if(listen(sockfd, 5) != 0){
-		cout << "Listen Error" << endl;
-		exit(1);
-	}
+    len = sizeof(cli);
 
-	connfd = accept(sockfd, (struct sockaddr*)&cliaddr, &len);
-	if(connfd < 0){
-		cout << "Accept Error" << endl;
-		exit(1);
-	}
+    // Accept the data packet from client and verification
+    connfd1 = accept(sockfd, (SA*)&cli, &len);
+    if (connfd1 < 0) {
+        printf("Server Accept Error");
+        exit(1);
+    }
 
-	len = sizeof(servaddr);
-	n = 0;
+    connfd2 = accept(sockfd, (SA*)&cli, &len);
+    if (connfd2 < 0) {
+        printf("Server Accept Error");
+        exit(1);
+    }
 
-        while (1) {
+    bzero(buff, MAX);
 
-		//Receive the client packet along with the address it is coming from
-		/*n = recvfrom(sockfd, (char *)buffer, sizeof(buffer),
-			MSG_WAITALL, ( struct sockaddr *) &cliaddr, &len);
-		buffer[n] = '\0';
+    // read the message from client and copy it in buffer
+    read(connfd1, buff, sizeof(buff));
 
-		//Otherwise, the server responds
-		sendto(sockfd, (const char *)buffer, strlen(buffer),
-			MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);*/
+    printf("%s", buff);
 
-		//n = read(sockfd, (char*)buffer, sizeof(buffer));
-		n = recvfrom(connfd, (char*) buffer, sizeof(buffer), MSG_WAITALL, (struct sockaddr*) &cliaddr, &len);
-		buffer[n] = '\0';
-		if(n > 0){
-			sendto(connfd, (const char*) buffer, strlen(buffer), MSG_CONFIRM, (const struct sockaddr*) &cliaddr, len);
+    char msg1[MAX];
+    char msg2[MAX];
 
-			cout << n << endl;
-			cout << buffer << endl;
-		}
-		
-	}
-	return 0;
+    strcpy(msg1, buff);
+
+    // print buffer which contains the client contents
+    bzero(buff, MAX);
+
+    read(connfd2, buff, sizeof(buff));
+
+    printf("%s", buff);
+
+    strcpy(msg2, buff);
+
+    strcpy(buff, "X: Alice Received\n");
+
+    // and send that buffer to client
+    write(connfd1, buff, sizeof(buff));
+    write(connfd2, buff, sizeof(buff));
+
+    printf("Sent acknowledgement to both X and Y\n");
+
+    // After chatting close the socket
+    close(sockfd);
 }
