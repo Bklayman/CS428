@@ -36,13 +36,13 @@ int main()
     }
 
     bzero(buff, sizeof(buff));
-    strcpy(buff, "Client X: Alice\n");
+    strcpy(buff, "Client X: Alice");
     strcpy(sent1, buff);
     write(sockfd, buff, sizeof(buff));
     bzero(buff, sizeof(buff));
     read(sockfd, buff, sizeof(buff));
-    printf("%s", sent1);
-    printf("%s", buff);
+    printf("Client X: %s\n", sent1);
+    printf("Client X: %s\n", buff);
 
     // close the socket
     close(sockfd);

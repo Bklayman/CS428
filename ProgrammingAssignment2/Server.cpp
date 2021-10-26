@@ -15,7 +15,7 @@
 // Driver function
 int main()
 {
-    int sockfd, connfd1, connfd2, n;
+    int sockfd, connfd1, connfd2;
     socklen_t len;
     struct sockaddr_in servaddr, cli;
 		char buff[MAX];
@@ -66,7 +66,7 @@ int main()
     // read the message from client and copy it in buffer
     read(connfd1, buff, sizeof(buff));
 
-    printf("%s", buff);
+    printf("Server: %s\n", buff);
 
     char msg1[MAX];
     char msg2[MAX];
@@ -78,7 +78,7 @@ int main()
 
     read(connfd2, buff, sizeof(buff));
 
-    printf("%s", buff);
+    printf("Server: %s\n", buff);
 
     strcpy(msg2, buff);
 
@@ -92,7 +92,7 @@ int main()
     write(connfd1, final, sizeof(final));
     write(connfd2, final, sizeof(final));
 
-    printf("Sent acknowledgement to both X and Y\n");
+    printf("Server: Sent acknowledgement to both X and Y\n");
 
     // After chatting close the socket
     close(sockfd);
