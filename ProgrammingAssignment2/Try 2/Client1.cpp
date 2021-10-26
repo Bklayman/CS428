@@ -10,8 +10,8 @@
 
 int main()
 {
-    int sockfd, connfd, n;
-    struct sockaddr_in servaddr, cli;
+    int sockfd;
+    struct sockaddr_in servaddr;
 		char buff[MAX];
 		char sent1[MAX];
 
@@ -36,13 +36,13 @@ int main()
     }
 
     bzero(buff, sizeof(buff));
-		buff = "Client X: Alice\n";
-		sent1 = buff;
+    strcpy(buff, "Client X: Alice\n");
+    strcpy(sent1, buff);
     write(sockfd, buff, sizeof(buff));
     bzero(buff, sizeof(buff));
     read(sockfd, buff, sizeof(buff));
     printf("%s", sent1);
-		prints("%s", buff);
+    printf("%s", buff);
 
     // close the socket
     close(sockfd);

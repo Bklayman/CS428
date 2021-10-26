@@ -61,12 +61,12 @@ int main()
     // print buffer which contains the client contents
     bzero(buff, MAX);
     n = 0;
-		buff = "X: Alice received";
+    strcpy(buff, "X: Alice Received\n");
 
     // and send that buffer to client
     write(connfd, buff, sizeof(buff));
 
-		printf("Sent acknowledgement to X.");
+    printf("Sent acknowledgement to X\n");
 
     // After chatting close the socket
     close(sockfd);
