@@ -57,14 +57,106 @@ vector<vector<int>> getData(char* fileName){
   return result;
 }
 
+vector<int> calcDistances(vector<vector<int>> data, int index){
+  vector<int> result;
+
+  return result;
+}
+
+void calcNodeTable(vector<vector<int>> data, int index){
+  //Initializes result table
+  vector<vector<string>> result;
+  vector<string> labels;
+  labels.push_back("step");
+  labels.push_back("N'");
+  for(int i = 0; i < data[index].size(); i++){
+    labels.push_back("D(" + to_string(i) + ")");
+  }
+  result.push_back(labels);
+
+  //Initializes each line in the result table
+  for(int i = 0; i < data.size(); i++){
+    vector<string> curLine;
+    curLine.push_back(to_string(i));
+    curLine.push_back("");
+    for(int j = 0; j < data.size(); j++){
+      curLine.push_back("");
+    }
+    result.push_back(curLine);
+  }
+
+  //Initializes distances for each node and node distance is calculated from for each node
+  vector<int> distances = data[index];
+  vector<string> foundFrom;
+  for(int i = 0; i < distances.size(); i++){
+    if(distances[i] == 999){
+      foundFrom.push_back("");
+    } else {
+      foundFrom.push_back(to_string(index));
+    }
+  }
+
+  //Runs for data.size() steps
+  for(int i = 0; i < data.size(); i++){
+    int nextMin = -1;
+    int minDistance = -1;
+
+    //Gets the closest un-traversed node and the distance of that node
+    for(int j = 0; j < data.size(); j++){
+      if(distances[j] != 999 && (nextMin == -1 || (minDistance != -1 && minDistance > distances[j] && distances[j] != -1))){
+        nextMin = j;
+        minDistance = distances[j];
+      }
+    }
+
+    //Updates the distance vector and N' for the current line of the result table
+    result[i + 1][1] = result[i][1] + to_string(nextMin);
+    distances[nextMin] = -1;
+
+  }
+
+}
+
+//Prints the results within the input vector with each element taking exactly 4 characters
+void printResults(vector<vector<int>> results){
+  for(int i = 0; i < results.size(); i++){
+    for(int j = 0; j < results[i].size(); j++){
+      cout << results[i][j];
+      while(results[i][j] < 1000){
+        cout << " ";
+        results[i][j]*= 10;
+      }
+    }
+    cout << endl;
+  }
+}
+
 int main(int argc, char** argv){
   //Make sure that input has the correct number of values, give error otherwise
-  if(argc != 2){
-    cout << "Usage: ./Dijkstras [Input File]" << endl;
+  if(argc != 2 && argc != 3){
+    cout << "Usage: ./Dijkstras [Input File] [Optional Node Number]" << endl;
     exit(1);
   }
 
   vector<vector<int>> data = getData(argv[1]);
 
-  
+  if(argc == 2){
+    //If no node specified, print entire table, giving distances for all nodes
+    vector<vector<int>> result;
+    for(int i = 0; i < data.size(); i++){
+      result.push_back(calcDistances(data, i));
+    }
+    printResults(result);
+  } else {
+    //If a node is specified, show that node's table
+    int chosenNode = -1;
+    try{
+      chosenNode = stoi(argv[2]);
+    } catch(exception& e){
+      cout << "Error: Chosen node is not an integer" << endl;
+      exit(1);
+    }
+    calcNodeTable(data, chosenNode);
+  }
+
 }
