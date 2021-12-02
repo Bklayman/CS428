@@ -59,6 +59,43 @@ vector<vector<int>> getData(char* fileName){
 
 vector<int> calcDistances(vector<vector<int>> data, int index){
   vector<int> result;
+  vector<int> distances = data[index];
+
+  if(index < 0 || index >= data.size()){
+    cout << "Error: Invalid node index" << endl;
+    exit(1);
+  }
+
+  for(int i = 0; i < data.size(); i++){
+    result.push_back(-1);
+  }
+
+  //Runs for data.size() steps
+  for(int i = 0; i < data.size(); i++){
+    int nextMin = -1;
+    int minDistance = -1;
+
+    //Gets the closest un-traversed node and the distance of that node
+    for(int j = 0; j < data.size(); j++){
+      if(distances[j] != -1 && distances[j] != 999 && (nextMin == -1 || (minDistance != -1 && minDistance > distances[j]))){
+        nextMin = j;
+        minDistance = distances[j];
+      }
+    }
+
+    //Updates the distance vector and N' for the current line of the result table
+    distances[nextMin] = -1;
+    result[nextMin] = minDistance;
+
+    for(int j = 0; j < data.size(); j++){
+      if(data[nextMin][j] != 999){
+        if(distances[j] != -1 && distances[j] > minDistance + data[nextMin][j]){
+          distances[j] = minDistance + data[nextMin][j];
+        }
+      }
+    }
+
+  }
 
   return result;
 }
@@ -66,7 +103,7 @@ vector<int> calcDistances(vector<vector<int>> data, int index){
 void printNodeTable(vector<vector<string>> nodeTable){
   for(int i = 0; i < nodeTable.size(); i++){
     for(int j = 0; j < nodeTable[i].size(); j++){
-      while(nodeTable[i][j].size() < 9){
+      while(nodeTable[i][j].size() < nodeTable.size() - 1){
         nodeTable[i][j] = nodeTable[i][j] + " ";
       }
       cout << nodeTable[i][j] << " ";
@@ -164,6 +201,9 @@ void printResults(vector<vector<int>> results){
       cout << results[i][j];
       while(results[i][j] < 1000){
         cout << " ";
+        if(results[i][j] == 0){
+          results[i][j] = 1;
+        }
         results[i][j]*= 10;
       }
     }
