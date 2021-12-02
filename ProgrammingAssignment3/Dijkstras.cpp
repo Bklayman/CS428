@@ -63,7 +63,24 @@ vector<int> calcDistances(vector<vector<int>> data, int index){
   return result;
 }
 
+void printNodeTable(vector<vector<string>> nodeTable){
+  for(int i = 0; i < nodeTable.size(); i++){
+    for(int j = 0; j < nodeTable[i].size(); j++){
+      while(nodeTable[i][j].size() < 9){
+        nodeTable[i][j] = nodeTable[i][j] + " ";
+      }
+      cout << nodeTable[i][j] << " ";
+    }
+    cout << endl;
+  }
+}
+
 void calcNodeTable(vector<vector<int>> data, int index){
+  if(index < 0 || index >= data.size()){
+    cout << "Error: Invalid node index" << endl;
+    exit(1);
+  }
+
   //Initializes result table
   vector<vector<string>> result;
   vector<string> labels;
@@ -100,20 +117,43 @@ void calcNodeTable(vector<vector<int>> data, int index){
   for(int i = 0; i < data.size(); i++){
     int nextMin = -1;
     int minDistance = -1;
+    result[i + 1][0] = to_string(i);
 
     //Gets the closest un-traversed node and the distance of that node
     for(int j = 0; j < data.size(); j++){
-      if(distances[j] != 999 && (nextMin == -1 || (minDistance != -1 && minDistance > distances[j] && distances[j] != -1))){
+      if(distances[j] != -1 && distances[j] != 999 && (nextMin == -1 || (minDistance != -1 && minDistance > distances[j]))){
         nextMin = j;
         minDistance = distances[j];
       }
     }
 
     //Updates the distance vector and N' for the current line of the result table
-    result[i + 1][1] = result[i][1] + to_string(nextMin);
+    if(i == 0){
+      result[i + 1][1] = to_string(nextMin);
+    } else {
+      result[i + 1][1] = result[i][1] + to_string(nextMin);
+    }
     distances[nextMin] = -1;
 
+    for(int j = 0; j < data.size(); j++){
+      if(data[nextMin][j] != 999){
+        if(distances[j] != -1 && distances[j] > minDistance + data[nextMin][j]){
+          distances[j] = minDistance + data[nextMin][j];
+          foundFrom[j] = to_string(nextMin);
+        }
+      }
+      if(distances[j] != -1){
+        if(distances[j] == 999){
+          result[i+1][j+2] = "N/A";
+        } else {
+          result[i + 1][j + 2] = to_string(distances[j]) + "," + foundFrom[j];
+        }
+      }
+    }
+
   }
+
+  printNodeTable(result);
 
 }
 
