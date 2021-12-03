@@ -57,10 +57,12 @@ vector<vector<int>> getData(char* fileName){
   return result;
 }
 
+// Returns all shortest distances from the indexed node
 vector<int> calcDistances(vector<vector<int>> data, int index){
   vector<int> result;
   vector<int> distances = data[index];
 
+  // Checks if the chosen node has a valid index, throws an error otherwise
   if(index < 0 || index >= data.size()){
     cout << "Error: Invalid node index" << endl;
     exit(1);
@@ -87,6 +89,7 @@ vector<int> calcDistances(vector<vector<int>> data, int index){
     distances[nextMin] = -1;
     result[nextMin] = minDistance;
 
+    // Updates the distances vector if the chosen node has a shorter path to other nodes
     for(int j = 0; j < data.size(); j++){
       if(data[nextMin][j] != 999){
         if(distances[j] != -1 && distances[j] > minDistance + data[nextMin][j]){
@@ -100,6 +103,7 @@ vector<int> calcDistances(vector<vector<int>> data, int index){
   return result;
 }
 
+// Prints the table gotten from one selected node
 void printNodeTable(vector<vector<string>> nodeTable){
   for(int i = 0; i < nodeTable.size(); i++){
     for(int j = 0; j < nodeTable[i].size(); j++){
@@ -112,7 +116,9 @@ void printNodeTable(vector<vector<string>> nodeTable){
   }
 }
 
+// Returns the ndoe table for a selected node
 void calcNodeTable(vector<vector<int>> data, int index){
+  // Checks if the selected node has a valid index, throws an error otherwise
   if(index < 0 || index >= data.size()){
     cout << "Error: Invalid node index" << endl;
     exit(1);
@@ -173,12 +179,15 @@ void calcNodeTable(vector<vector<int>> data, int index){
     distances[nextMin] = -1;
 
     for(int j = 0; j < data.size(); j++){
+      // Checks if a shorter path to other nodes exists through the chosen node and updates distances if so
       if(data[nextMin][j] != 999){
         if(distances[j] != -1 && distances[j] > minDistance + data[nextMin][j]){
           distances[j] = minDistance + data[nextMin][j];
           foundFrom[j] = to_string(nextMin);
         }
       }
+
+      // If the node has not already had their path found, add their current distance to the node table
       if(distances[j] != -1){
         if(distances[j] == 999){
           result[i+1][j+2] = "N/A";
@@ -186,8 +195,8 @@ void calcNodeTable(vector<vector<int>> data, int index){
           result[i + 1][j + 2] = to_string(distances[j]) + "," + foundFrom[j];
         }
       }
+      
     }
-
   }
 
   printNodeTable(result);
